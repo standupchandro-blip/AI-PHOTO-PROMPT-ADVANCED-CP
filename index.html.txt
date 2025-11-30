@@ -1,0 +1,450 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Builder (Enhanced)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for a polished look */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        .container-card {
+            max-width: 500px;
+            margin: 2rem auto;
+            background-color: #ffffff;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 10px rgba(0, 0, 0, 0.04);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+        }
+        .step-section {
+            display: none;
+        }
+        .step-section.active {
+            display: block;
+        }
+        /* Custom radio button styling */
+        .custom-radio input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .custom-radio label {
+            cursor: pointer;
+            display: block;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            font-weight: 500;
+            text-align: center;
+        }
+        .custom-radio input[type="radio"]:checked + label {
+            background-color: #3b82f6; /* Blue 500 */
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+        }
+        .custom-radio label:hover {
+            border-color: #93c5fd; /* Blue 300 */
+        }
+        .progress-bar-fill {
+            transition: width 0.3s ease-in-out;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="p-4">
+
+
+    <div id="app" class="container-card">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">AI Prompt Genius 🧠</h1>
+        <p class="text-gray-500 mb-6">Build your prompt, then let our AI give it a creative boost!</p>
+
+
+        <!-- Progress Bar -->
+        <div class="mb-6">
+            <div class="h-2 bg-gray-200 rounded-full">
+                <div id="progressBar" class="h-2 bg-blue-500 rounded-full progress-bar-fill" style="width: 0%;"></div>
+            </div>
+            <p id="progressText" class="text-sm text-gray-500 mt-1 text-right">Step 1 of 5</p>
+        </div>
+
+
+        <!-- STEP 1: Subject & Action -->
+        <div id="step-1" class="step-section active">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Step 1: The Core Idea 🌟</h2>
+            <div class="space-y-4">
+                <div>
+                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Who or what is the main subject? (Required)</label>
+                    <input type="text" id="subject" name="subject" value="" placeholder="e.g., A silver dragon, Spiderman, A single rose" class="form-input">
+                </div>
+                <div>
+                    <label for="action" class="block text-sm font-medium text-gray-700 mb-1">What is the subject doing/where is it?</label>
+                    <input type="text" id="action" name="action" value="" placeholder="e.g., soaring over a stormy sea, eating chips in his bedroom" class="form-input">
+                </div>
+            </div>
+        </div>
+
+
+        <!-- STEP 2: Medium & Art Style -->
+        <div id="step-2" class="step-section">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Step 2: Medium & Style 🎨</h2>
+            <p class="text-sm text-gray-500 mb-3">How do you want the image to look? (Choose one or add your own)</p>
+            <div class="grid grid-cols-2 gap-3 custom-radio mb-4">
+                <input type="radio" id="style-photo" name="medium" value="professional photography, detailed, photorealistic"><label for="style-photo">Photography</label>
+                <input type="radio" id="style-art" name="medium" value="digital painting, highly detailed, fantasy art"><label for="style-art">Digital Painting</label>
+                <input type="radio" id="style-3d" name="medium" value="3D render, Octane render, unreal engine"><label for="style-3d">3D Render (CGI)</label>
+                <input type="radio" id="style-anime" name="medium" value="anime aesthetic, volumetric lighting, cel-shaded"><label for="style-anime">Anime/Cartoon</label>
+            </div>
+            <div>
+                <label for="customStyle" class="block text-sm font-medium text-gray-700 mb-1">Add Custom Details for Style (Optional):</label>
+                <textarea id="customStyle" name="customStyle" rows="2" placeholder="e.g., inspired by Van Gogh, 8-bit pixel art, macro lens shot" class="form-input"></textarea>
+            </div>
+        </div>
+
+
+        <!-- STEP 3: Mood & Lighting -->
+        <div id="step-3" class="step-section">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Step 3: Mood & Lighting 💡</h2>
+            <p class="text-sm text-gray-500 mb-3">Set the atmosphere of the scene. (Choose one or add your own)</p>
+            <div class="grid grid-cols-2 gap-3 custom-radio mb-4">
+                <input type="radio" id="mood-cinematic" name="moodLighting" value="cinematic volumetric lighting, dramatic shadows, moody"><label for="mood-cinematic">Cinematic/Moody</label>
+                <input type="radio" id="mood-soft" name="moodLighting" value="soft focus, tranquil, peaceful atmosphere"><label for="mood-soft">Soft/Peaceful</label>
+                <input type="radio" id="mood-neon" name="moodLighting" value="neon glow, cyberpunk aesthetic, dark streets"><label for="mood-neon">Neon/Cyberpunk</label>
+                <input type="radio" id="mood-golden" name="moodLighting" value="golden hour, warm, diffused sunlight"><label for="mood-golden">Golden Hour</label>
+            </div>
+            <div>
+                <label for="customLighting" class="block text-sm font-medium text-gray-700 mb-1">Add Custom Details for Lighting (Optional):</label>
+                <textarea id="customLighting" name="customLighting" rows="2" placeholder="e.g., strong rim light, single overhead lamp, foggy morning light" class="form-input"></textarea>
+            </div>
+        </div>
+
+
+        <!-- STEP 4: Composition -->
+        <div id="step-4" class="step-section">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Step 4: Composition 📐</h2>
+            <p class="text-sm text-gray-500 mb-3">How should the elements be arranged? (Choose one or add your own)</p>
+            <div class="grid grid-cols-2 gap-3 custom-radio mb-4">
+                <input type="radio" id="comp-thirds" name="composition" value="rule of thirds, symmetrical composition"><label for="comp-thirds">Symmetrical/Rule of Thirds</label>
+                <input type="radio" id="comp-macro" name="composition" value="macro photograph, extreme close-up"><label for="comp-macro">Macro/Close-Up</label>
+                <input type="radio" id="comp-dutch" name="composition" value="dutch angle, chaotic perspective"><label for="comp-dutch">Dutch Angle</label>
+                <input type="radio" id="comp-wide" name="composition" value="ultra-wide shot, vast landscape, epic scale"><label for="comp-wide">Epic/Wide Shot</label>
+            </div>
+            <div>
+                <label for="customComposition" class="block text-sm font-medium text-gray-700 mb-1">Add Custom Details for Composition (Optional):</label>
+                <textarea id="customComposition" name="customComposition" rows="2" placeholder="e.g., shot on 50mm lens, low angle, leading lines" class="form-input"></textarea>
+            </div>
+        </div>
+
+
+        <!-- STEP 5: Final Modifiers -->
+        <div id="step-5" class="step-section">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Step 5: Final Quality Boosters ✨</h2>
+            <p class="text-sm text-gray-500 mb-3">Add technical terms to ensure maximum quality.</p>
+            <div class="space-y-4">
+                <input type="text" id="finalMods" name="finalMods" value="8k, highly detailed, smooth, trending on ArtStation" placeholder="e.g., 8k, highly detailed, smooth, trending on ArtStation" class="form-input">
+                <p class="text-xs text-gray-500">Suggested default: `8k, highly detailed, smooth, trending on ArtStation`</p>
+            </div>
+        </div>
+
+
+        <!-- FINAL PROMPT (Step 6) -->
+        <div id="step-6" class="step-section">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Step 6: Review & Enhance! 🚀</h2>
+            <p class="text-gray-600 mb-4">You have a structured prompt. Now, let's use AI to add rich descriptive flair!</p>
+
+
+            <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mb-4">
+                <h3 class="font-semibold text-blue-800 mb-2">Structured Prompt:</h3>
+                <p id="basePromptDisplay" class="text-sm text-blue-700 font-mono break-words"></p>
+            </div>
+
+
+            <button id="enhanceBtn" onclick="generateEnhancedPrompt()" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-md hover:shadow-lg flex items-center justify-center">
+                <span id="enhanceText">Enhance with AI (Deep Detail)</span>
+                <div id="loadingIndicator" class="hidden spinner-border animate-spin inline-block w-6 h-6 border-4 rounded-full border-t-transparent ml-2" role="status"></div>
+            </button>
+
+
+            <h3 class="font-semibold text-gray-700 mt-6 mb-2">Final Prompt for AI Client:</h3>
+            <div class="bg-gray-100 p-4 rounded-xl border border-gray-200">
+                <textarea id="finalPromptTextarea" rows="8" readonly class="w-full bg-transparent text-lg font-mono text-gray-800 focus:outline-none resize-none"></textarea>
+            </div>
+
+
+            <div class="mt-4 flex flex-col space-y-3">
+                <button onclick="copyPrompt()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-xl transition duration-150 shadow-md hover:shadow-lg">
+                    Copy Final Prompt
+                </button>
+                <button onclick="restart()" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-xl transition duration-150">
+                    Start Over
+                </button>
+            </div>
+
+
+            <!-- Custom message box and spinner styles -->
+            <div id="messageBox" class="hidden fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white p-3 rounded-lg shadow-xl transition-opacity duration-300" style="opacity: 0;">
+                Prompt Copied Successfully!
+            </div>
+        </div>
+
+
+
+
+        <!-- Navigation Buttons -->
+        <div class="mt-8 pt-4 border-t border-gray-200 flex justify-between">
+            <button id="prevBtn" onclick="navigateStep(-1)" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-xl transition duration-150 disabled:opacity-50" disabled>
+                ← Back
+            </button>
+            <button id="nextBtn" onclick="navigateStep(1)" class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition duration-150">
+                Next →
+            </button>
+        </div>
+
+
+    </div>
+
+
+    <script>
+        // Global state and configuration
+        const STEPS = 6; // 5 input steps + 1 final step
+        let currentStep = 1;
+        let aiEnhancementText = ""; // Stores the text generated by the LLM
+
+
+        // Data structure to hold the prompt components (Expanded for custom fields)
+        let promptData = {
+            subject: "",
+            action: "",
+            medium: "",
+            customStyle: "",
+            moodLighting: "",
+            customLighting: "",
+            composition: "",
+            customComposition: "",
+            finalMods: ""
+        };
+
+
+        // LLM API Configuration
+        const MODEL = 'gemini-2.5-flash-preview-09-2025';
+        const API_KEY = "";
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+        const MAX_RETRIES = 3;
+
+
+        // DOM elements
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const finalPromptTextarea = document.getElementById('finalPromptTextarea');
+        const messageBox = document.getElementById('messageBox');
+        const basePromptDisplay = document.getElementById('basePromptDisplay');
+        const enhanceBtn = document.getElementById('enhanceBtn');
+        const enhanceText = document.getElementById('enhanceText');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+
+
+        // --- Core Functions ---
+
+
+        /**
+         * Updates the UI to show the current step's content.
+         */
+        function updateUI() {
+            // 1. Update Step Visibility
+            document.querySelectorAll('.step-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+
+
+            // 2. Update Progress Bar
+            const progress = ((currentStep - 1) / (STEPS - 1)) * 100;
+            progressBar.style.width = `${progress}%`;
+
+
+            // 3. Update Progress Text
+            if (currentStep === STEPS) {
+                progressText.textContent = `Review & Finalize`;
+            } else {
+                progressText.textContent = `Step ${currentStep} of ${STEPS - 1}`;
+            }
+
+
+            // 4. Update Navigation Buttons
+            prevBtn.disabled = currentStep === 1;
+
+
+            if (currentStep === STEPS) {
+                nextBtn.textContent = 'Start Over';
+                nextBtn.onclick = restart;
+                generateBasePrompt(); // Generate base prompt for display
+                // If we land on Step 6, update the final text area
+                updateFinalPromptTextarea();
+            } else {
+                nextBtn.textContent = 'Next →';
+                nextBtn.onclick = () => navigateStep(1);
+            }
+        }
+
+
+        /**
+         * Gathers data from the current form step and stores it in promptData.
+         * @returns {boolean} True if validation passes, false otherwise.
+         */
+        function captureDataAndValidate() {
+            let required = true;
+
+
+            // Step 1: Subject & Action (Subject is required)
+            if (currentStep === 1) {
+                const subject = document.getElementById('subject').value.trim();
+                if (!subject) { required = false; }
+                promptData.subject = subject;
+                promptData.action = document.getElementById('action').value.trim();
+            }
+            // Step 2: Medium & Custom Style
+            else if (currentStep === 2) {
+                const medium = document.querySelector('input[name="medium"]:checked');
+                promptData.medium = medium ? medium.value : "";
+                promptData.customStyle = document.getElementById('customStyle').value.trim();
+            }
+            // Step 3: Mood & Custom Lighting
+            else if (currentStep === 3) {
+                const moodLighting = document.querySelector('input[name="moodLighting"]:checked');
+                promptData.moodLighting = moodLighting ? moodLighting.value : "";
+                promptData.customLighting = document.getElementById('customLighting').value.trim();
+            }
+            // Step 4: Composition & Custom Composition
+            else if (currentStep === 4) {
+                const composition = document.querySelector('input[name="composition"]:checked');
+                promptData.composition = composition ? composition.value : "";
+                promptData.customComposition = document.getElementById('customComposition').value.trim();
+            }
+            // Step 5: Final Modifiers
+            else if (currentStep === 5) {
+                promptData.finalMods = document.getElementById('finalMods').value.trim();
+            }
+
+
+
+
+            if (!required) {
+                showCustomMessage("Please enter the main subject in Step 1.", 'bg-red-500');
+                return false;
+            }
+            return true;
+        }
+
+
+        /**
+         * Navigates between steps.
+         * @param {number} direction - 1 for next, -1 for previous.
+         */
+        function navigateStep(direction) {
+            // If moving forward and not on the final step, validate and capture data
+            if (direction > 0 && currentStep < STEPS) {
+                if (!captureDataAndValidate()) {
+                    return; // Stop if validation fails
+                }
+            }
+
+
+            currentStep += direction;
+
+
+            if (currentStep < 1) {
+                currentStep = 1;
+            } else if (currentStep > STEPS) {
+                currentStep = STEPS;
+            }
+
+
+            updateUI();
+        }
+
+
+        /**
+         * Generates the structured prompt string (without AI enhancement).
+         * Used for display in Step 6.
+         */
+        function generateBasePrompt() {
+            // Structure: Subject, Action, Medium, Custom Style, Mood/Lighting, Custom Lighting, Composition, Custom Comp, Final Mods
+            const parts = [
+                promptData.subject,
+                promptData.action,
+                promptData.medium,
+                promptData.customStyle,
+                promptData.moodLighting,
+                promptData.customLighting,
+                promptData.composition,
+                promptData.customComposition,
+                promptData.finalMods
+            ];
+
+
+            const basePrompt = parts
+                .map(part => part.trim())
+                .filter(part => part)
+                .join(', ');
+
+
+            basePromptDisplay.textContent = basePrompt;
+            return basePrompt;
+        }
+
+
+        /**
+         * Updates the final textarea with the combined base prompt and AI enhancement.
+         */
+        function updateFinalPromptTextarea() {
+            const basePrompt = generateBasePrompt();
+            const enhancedPrompt = [basePrompt, aiEnhancementText]
+                .map(part => part.trim())
+                .filter(part => part)
+                .join(', ');
+
+
+            finalPromptTextarea.value = enhancedPrompt;
+        }
+
+
+        // --- LLM Integration ---
+
+
+        /**
+         * Calls the Gemini API to generate deep descriptive details based on the base prompt.
+         */
+        async function generateEnhancedPrompt() {
+            const basePrompt = generateBasePrompt();
+            if (!basePrompt) {
+                 showCustomMessage("Please fill in the Subject in Step 1 before enhancing.", 'bg-red-500');
+                 return;
+            }
+            const userQuery = `The foundational prompt elements are: "${basePrompt}". Based on this, provide deeper descriptive details for the AI model about the environment, character, and mood.`;
+
+
+            // Disable button and show loading
+            enhanceBtn.disabled = true;
+            enhanceText.textContent = 'AI is thinking...';
+            loadingIndicator.classList.re
