@@ -1,0 +1,274 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Builder</title>
+
+
+    <style>
+        /* Minimal, robust CSS */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f0f4f8;
+            padding: 10px;
+        }
+        .card {
+            max-width: 500px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+        .step-section {
+            display: none;
+        }
+        .step-section[data-active="true"] {
+            display: block;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        .btn-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-full {
+            width: 100%;
+            margin-top: 10px;
+        }
+        /* Diagnostic Message Box Style */
+        #messageBox {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div id="app" class="card">
+        <h1 style="font-size: 24px; font-weight: bold;">AI Prompt Builder ✍️</h1>
+        <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;">Ultra-Stable Version for Diagnostic Testing.</p>
+
+
+        <!-- Progress Bar -->
+        <div style="text-align: right; margin-bottom: 15px;">
+            <p id="progressText" style="font-size: 14px; color: #555;">Step 1 of 5</p>
+        </div>
+
+
+        <!-- STEP 1: Subject & Action -->
+        <div id="step-1" class="step-section" data-active="true">
+            <h2 style="font-size: 18px;">1. Core Idea</h2>
+            <label for="subject">Main Subject (Required for next step)</label>
+            <input type="text" id="subject" placeholder="A silver dragon">
+
+
+            <label for="action">Action/Setting</label>
+            <input type="text" id="action" placeholder="soaring over a stormy sea">
+        </div>
+
+
+        <!-- STEP 2: Medium & Art Style -->
+        <div id="step-2" class="step-section" data-active="false">
+            <h2 style="font-size: 18px;">2. Medium & Style</h2>
+            <!-- Content here (omitted for brevity, but kept in the file) -->
+            <label>Style Selection</label>
+            <input type="radio" name="medium" value="photo"> Photo <br>
+            <input type="radio" name="medium" value="painting"> Painting
+        </div>
+
+
+        <!-- STEP 3-5 (Simplified for test) -->
+        <div id="step-3" class="step-section" data-active="false"><h2 style="font-size: 18px;">3. Mood & Lighting</h2></div>
+        <div id="step-4" class="step-section" data-active="false"><h2 style="font-size: 18px;">4. Composition</h2></div>
+        <div id="step-5" class="step-section" data-active="false"><h2 style="font-size: 18px;">5. Quality Boosters</h2></div>
+
+
+        <!-- STEP 6: Review & Output -->
+        <div id="step-6" class="step-section" data-active="false">
+            <h2 style="font-size: 18px;">6. Final Prompt</h2>
+            <label for="finalPromptTextarea">Complete Structured Prompt</label>
+            <textarea id="finalPromptTextarea" rows="8" readonly></textarea>
+            <button id="copyBtn" class="btn-primary btn-full" onclick="copyPrompt()">Copy Final Prompt</button>
+        </div>
+
+
+        <!-- Diagnostic Message Box -->
+        <div id="messageBox" style="display: none;"></div>
+
+
+        <!-- Navigation Buttons -->
+        <div class="btn-group">
+            <button id="prevBtn" class="btn-secondary" onclick="navigateStep(-1)" disabled>← Back</button>
+            <button id="nextBtn" class="btn-primary" onclick="navigateStep(1)">Next →</button>
+        </div>
+
+
+    </div>
+
+
+    <script>
+        // --- Core State and Configuration ---
+        const TOTAL_WIZARD_STEPS = 5; 
+        const TOTAL_STEPS = 6;
+        let currentStep = 1;
+        
+        // --- DOM References ---
+        const elements = {};
+        const stepSections = [];
+
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate DOM references
+            ['progressText', 'prevBtn', 'nextBtn', 'subject', 'finalPromptTextarea', 'messageBox'].forEach(id => {
+                elements[id] = document.getElementById(id);
+            });
+            
+            for (let i = 1; i <= TOTAL_STEPS; i++) {
+                const stepEl = document.getElementById(`step-${i}`);
+                if (stepEl) stepSections.push(stepEl);
+            }
+
+
+            updateUI();
+        });
+        
+        // --- Core Logic (Removed for brevity, but getPromptData and buildPrompt are still required) ---
+        function getPromptData() { /* ... implementation ... */ return {subject: elements.subject.value.trim()}; }
+        function buildPrompt(data) { /* ... implementation ... */ return data.subject || "Prompt incomplete."; }
+        function updatePrompt() { elements.finalPromptTextarea.value = buildPrompt(getPromptData()); }
+
+
+        // --- UI Navigation ---
+
+
+        function updateUI() {
+            // 1. Step Visibility
+            stepSections.forEach((section, index) => {
+                const isActive = (index + 1) === currentStep;
+                section.setAttribute('data-active', isActive);
+            });
+
+
+            // 2. Navigation Buttons
+            elements.prevBtn.disabled = currentStep === 1;
+            elements.prevBtn.classList.toggle('btn-disabled', currentStep === 1);
+            
+            if (currentStep < TOTAL_STEPS) {
+                elements.nextBtn.textContent = 'Next →';
+            } else {
+                elements.nextBtn.textContent = 'Start Over';
+            }
+            
+            // 3. Progress Text
+            elements.progressText.textContent = currentStep === TOTAL_STEPS ? 
+                `Review & Finalize` : 
+                `Step ${currentStep} of ${TOTAL_WIZARD_STEPS}`;
+            
+            // 4. Update prompt only when arriving at the final review step
+            if (currentStep === TOTAL_STEPS) {
+                updatePrompt(); 
+            }
+        }
+        
+        // Removed validation to eliminate it as a possible blocker
+
+
+        window.navigateStep = function(direction) {
+            // CRITICAL DIAGNOSTIC: Show message immediately upon function entry
+            showMessage(`Step transition triggered. Direction: ${direction}`, '#3b82f6', 1500);
+
+
+            // Use 'Start Over' for Step 6, otherwise advance/retreat
+            if (currentStep === TOTAL_STEPS && direction > 0) {
+                restart();
+                return;
+            }
+
+
+            currentStep = Math.min(TOTAL_STEPS, Math.max(1, currentStep + direction));
+            updateUI();
+            
+            // CRITICAL DIAGNOSTIC: Show message upon successful UI update
+            showMessage(`Now viewing Step ${currentStep}.`, '#10b981', 1500);
+        }
+
+
+        window.restart = function() {
+            // Simplified restart for diagnostic purposes
+            elements.subject.value = '';
+            currentStep = 1;
+            updateUI();
+            showMessage("Wizard restarted!", '#3b82f6', 1500);
+        }
+
+
+        // --- Utility Functions ---
+
+
+        window.copyPrompt = function() { /* ... copy function implementation ... */ }
+
+
+        function showMessage(message, color, duration = 3000) {
+            if (!elements.messageBox) return;
+
+
+            elements.messageBox.textContent = message;
+            elements.messageBox.style.backgroundColor = color === '#3b82f6' ? '#e0f2fe' : (color === '#10b981' ? '#d1fae5' : '#fee2e2');
+            elements.messageBox.style.color = color;
+            elements.messageBox.style.display = 'block';
+
+
+            setTimeout(() => {
+                elements.messageBox.style.display = 'none';
+            }, duration);
+        }
+
+
+    </script>
+</body>
+</html>
