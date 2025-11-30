@@ -1,0 +1,468 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Builder</title>
+
+
+    <style>
+        /* Minimal, robust CSS for maximum compatibility */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f0f4f8; /* Light background */
+            padding: 10px;
+        }
+        .card {
+            max-width: 500px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+
+        /* Inputs and Textareas */
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* Step Visibility */
+        .step-section {
+            display: none;
+        }
+        .step-section[data-active="true"] {
+            display: block;
+        }
+
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #059669;
+        }
+        .btn-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-full {
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        /* Radio Group Styling */
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .radio-option label {
+            cursor: pointer;
+            display: block;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: normal;
+        }
+        .radio-option input[type="radio"]:checked + label {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Output box */
+        #finalPromptTextarea {
+            background-color: #f3f4f6;
+            border: 1px solid #ddd;
+            font-family: monospace;
+            font-size: 14px;
+            color: #333;
+            resize: vertical;
+        }
+
+
+    </style>
+</head>
+<body>
+
+
+    <div id="app" class="card">
+        <h1 style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 10px;">AI Prompt Builder ✍️</h1>
+        <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;">Use the steps below to craft a professional image prompt.</p>
+
+
+        <!-- Progress Bar (Simple Text) -->
+        <div style="text-align: right; margin-bottom: 15px;">
+            <p id="progressText" style="font-size: 14px; color: #555;">Step 1 of 5</p>
+        </div>
+
+
+        <!-- STEP 1: Subject & Action -->
+        <div id="step-1" class="step-section" data-active="true">
+            <h2 style="font-size: 18px; margin-bottom: 10px; color: #3b82f6;">1. Core Idea</h2>
+            <label for="subject">Main Subject (Required)</label>
+            <input type="text" id="subject" placeholder="A silver dragon">
+
+
+            <label for="action">Action/Setting</label>
+            <input type="text" id="action" placeholder="soaring over a stormy sea">
+        </div>
+
+
+        <!-- STEP 2: Medium & Art Style -->
+        <div id="step-2" class="step-section" data-active="false">
+            <h2 style="font-size: 18px; margin-bottom: 10px; color: #3b82f6;">2. Medium & Style</h2>
+            <div class="radio-group" id="medium-options">
+                <!-- Radio Option 1 -->
+                <div class="radio-option">
+                    <input type="radio" id="style-photo" name="medium" value="professional photography, detailed, photorealistic">
+                    <label for="style-photo">Photography</label>
+                </div>
+                <!-- Radio Option 2 -->
+                <div class="radio-option">
+                    <input type="radio" id="style-art" name="medium" value="digital painting, highly detailed, fantasy art">
+                    <label for="style-art">Digital Painting</label>
+                </div>
+                <!-- Radio Option 3 -->
+                <div class="radio-option">
+                    <input type="radio" id="style-3d" name="medium" value="3D render, Octane render, unreal engine">
+                    <label for="style-3d">3D Render</label>
+                </div>
+                <!-- Radio Option 4 -->
+                <div class="radio-option">
+                    <input type="radio" id="style-anime" name="medium" value="anime aesthetic, volumetric lighting, cel-shaded">
+                    <label for="style-anime">Anime/Cartoon</label>
+                </div>
+            </div>
+            <label for="customStyle">Custom Style Details (Optional)</label>
+            <textarea id="customStyle" rows="2" placeholder="e.g., inspired by Van Gogh, 8-bit pixel art"></textarea>
+        </div>
+
+
+        <!-- STEP 3: Mood & Lighting -->
+        <div id="step-3" class="step-section" data-active="false">
+            <h2 style="font-size: 18px; margin-bottom: 10px; color: #3b82f6;">3. Mood & Lighting</h2>
+            <div class="radio-group" id="lighting-options">
+                <!-- Radio Options (Simplified) -->
+                <div class="radio-option">
+                    <input type="radio" id="mood-cinematic" name="moodLighting" value="cinematic volumetric lighting, dramatic shadows, moody">
+                    <label for="mood-cinematic">Cinematic/Moody</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="mood-golden" name="moodLighting" value="golden hour, warm, diffused sunlight">
+                    <label for="mood-golden">Golden Hour</label>
+                </div>
+            </div>
+            <label for="customLighting">Custom Lighting/Mood Details (Optional)</label>
+            <textarea id="customLighting" rows="2" placeholder="e.g., strong rim light, single overhead lamp, foggy morning light"></textarea>
+        </div>
+
+
+        <!-- STEP 4: Composition -->
+        <div id="step-4" class="step-section" data-active="false">
+            <h2 style="font-size: 18px; margin-bottom: 10px; color: #3b82f6;">4. Composition</h2>
+            <div class="radio-group" id="composition-options">
+                <!-- Radio Options (Simplified) -->
+                <div class="radio-option">
+                    <input type="radio" id="comp-thirds" name="composition" value="rule of thirds, symmetrical composition">
+                    <label for="comp-thirds">Rule of Thirds</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="comp-macro" name="composition" value="macro photograph, extreme close-up">
+                    <label for="comp-macro">Macro/Close-Up</label>
+                </div>
+            </div>
+            <label for="customComposition">Custom Composition Details (Optional)</label>
+            <textarea id="customComposition" rows="2" placeholder="e.g., shot on 50mm lens, low angle, leading lines"></textarea>
+        </div>
+
+
+        <!-- STEP 5: Final Modifiers -->
+        <div id="step-5" class="step-section" data-active="false">
+            <h2 style="font-size: 18px; margin-bottom: 10px; color: #3b82f6;">5. Quality Boosters</h2>
+            <label for="finalMods">Final Technical Modifiers</label>
+            <input type="text" id="finalMods" value="8k, highly detailed, smooth, trending on ArtStation" placeholder="e.g., 8k, highly detailed, smooth, trending on ArtStation">
+            <p style="font-size: 12px; color: #6b7280; margin-top: -10px;">(A good starting point is pre-filled)</p>
+        </div>
+        
+        <!-- STEP 6: Review & Output -->
+        <div id="step-6" class="step-section" data-active="false">
+            <h2 style="font-size: 18px; margin-bottom: 10px; color: #3b82f6;">6. Final Prompt</h2>
+            <label for="finalPromptTextarea">Complete Structured Prompt</label>
+            <textarea id="finalPromptTextarea" rows="8" readonly></textarea>
+
+
+            <!-- Disabled the AI button to ensure stability -->
+            <button id="enhanceBtn" class="btn-secondary btn-full btn-disabled" disabled>AI Enhancement Disabled for Stability</button>
+            <button id="copyBtn" class="btn-success btn-full" onclick="copyPrompt()">Copy Final Prompt</button>
+
+
+            <p id="messageBox" style="margin-top: 10px; font-weight: bold; display: none; text-align: center;"></p>
+        </div>
+
+
+        <!-- Navigation Buttons -->
+        <div class="btn-group">
+            <button id="prevBtn" class="btn-secondary" onclick="navigateStep(-1)" disabled>← Back</button>
+            <button id="nextBtn" class="btn-primary" onclick="navigateStep(1)">Next →</button>
+        </div>
+
+
+    </div>
+
+
+    <script>
+        // --- Core State and Configuration ---
+        const TOTAL_WIZARD_STEPS = 5; // Steps 1 through 5 are input; Step 6 is output
+        const TOTAL_STEPS = 6;
+        let currentStep = 1;
+        
+        // --- DOM References ---
+        const elements = {};
+        const stepSections = [];
+
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate DOM references once
+            ['progressText', 'prevBtn', 'nextBtn', 'subject', 'action', 'customStyle', 'customLighting', 'customComposition', 'finalMods', 'finalPromptTextarea', 'messageBox'].forEach(id => {
+                elements[id] = document.getElementById(id);
+            });
+            
+            for (let i = 1; i <= TOTAL_STEPS; i++) {
+                const stepEl = document.getElementById(`step-${i}`);
+                if (stepEl) stepSections.push(stepEl);
+            }
+
+
+            // NO INPUT/CHANGE LISTENERS HERE - we rely on navigation to update the prompt.
+
+
+            // Set initial state
+            updateUI();
+        });
+
+
+        // --- Data Aggregation and Output (ONLY RUNS ON NAVIGATION/RESTART) ---
+
+
+        function getPromptData() {
+            const data = {};
+            // Gather text inputs
+            ['subject', 'action', 'customStyle', 'customLighting', 'customComposition', 'finalMods'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) data[id] = input.value.trim();
+            });
+
+
+            // Gather radio selections (medium, moodLighting, composition)
+            ['medium', 'moodLighting', 'composition'].forEach(name => {
+                const checked = document.querySelector(`input[name="${name}"]:checked`);
+                data[name] = checked ? checked.value.trim() : '';
+            });
+
+
+            return data;
+        }
+
+
+        function buildPrompt(data) {
+            // Order the structural parts logically
+            const structuralParts = [
+                data.subject, 
+                data.action,
+                data.medium, 
+                data.customStyle,
+                data.moodLighting,
+                data.customLighting,
+                data.composition,
+                data.customComposition,
+                data.finalMods
+            ];
+
+
+            // Filter out empty parts and join them with a comma and space
+            return structuralParts.filter(p => p).join(', ');
+        }
+
+
+        function updatePrompt() {
+            if (!elements.finalPromptTextarea) return;
+            const data = getPromptData();
+            const finalPrompt = buildPrompt(data); 
+            elements.finalPromptTextarea.value = finalPrompt;
+        }
+
+
+        // --- UI Navigation ---
+
+
+        function updateUI() {
+            // 1. Step Visibility
+            stepSections.forEach((section, index) => {
+                const isActive = (index + 1) === currentStep;
+                section.setAttribute('data-active', isActive);
+            });
+
+
+            // 2. Navigation Buttons
+            elements.prevBtn.disabled = currentStep === 1;
+            elements.prevBtn.classList.toggle('btn-disabled', currentStep === 1);
+            
+            if (currentStep < TOTAL_STEPS) {
+                elements.nextBtn.textContent = 'Next →';
+                elements.nextBtn.onclick = () => navigateStep(1);
+            } else {
+                elements.nextBtn.textContent = 'Start Over';
+                elements.nextBtn.onclick = restart;
+            }
+            
+            // 3. Progress Text
+            elements.progressText.textContent = currentStep === TOTAL_STEPS ? 
+                `Review & Finalize` : 
+                `Step ${currentStep} of ${TOTAL_WIZARD_STEPS}`;
+            
+            // 4. Update prompt only when arriving at the final review step
+            if (currentStep === TOTAL_STEPS) {
+                updatePrompt(); 
+            }
+        }
+
+
+        function validateStep() {
+            // Only validate the required field on step 1
+            if (currentStep === 1 && !elements.subject.value.trim()) {
+                showMessage("Please enter the Main Subject to proceed.", '#ef4444');
+                return false;
+            }
+            return true;
+        }
+
+
+        window.navigateStep = function(direction) {
+            // If moving forward, validate and update the prompt before navigating
+            if (direction > 0 && currentStep < TOTAL_STEPS) {
+                if (!validateStep()) {
+                    return;
+                }
+                // Update prompt here on transition
+                updatePrompt();
+            }
+
+
+            currentStep = Math.min(TOTAL_STEPS, Math.max(1, currentStep + direction));
+            updateUI();
+        }
+
+
+        window.restart = function() {
+            // Clear all input fields and reset state
+            document.querySelectorAll('input[type="text"], textarea').forEach(input => {
+                if (input.id !== 'finalMods') {
+                    input.value = '';
+                }
+            });
+            document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+            elements.finalMods.value = "8k, highly detailed, smooth, trending on ArtStation";
+            
+            currentStep = 1;
+            updatePrompt();
+            updateUI();
+            showMessage("Wizard restarted!", '#3b82f6');
+        }
+
+
+        // --- Utility Functions ---
+
+
+        window.copyPrompt = function() {
+            if (!elements.finalPromptTextarea.value) {
+                showMessage("Nothing to copy!", '#ef4444');
+                return;
+            }
+
+
+            elements.finalPromptTextarea.select();
+            elements.finalPromptTextarea.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                showMessage('Prompt Copied Successfully!', '#10b981');
+            } catch (err) {
+                showMessage('Copy failed. Manual copy required.', '#ef4444');
+            }
+        }
+
+
+        function showMessage(message, color) {
+            if (!elements.messageBox) return;
+
+
+            elements.messageBox.textContent = message;
+            elements.messageBox.style.color = color;
+            elements.messageBox.style.display = 'block';
+
+
+            setTimeout(() => {
+                elements.messageBox.style.display = 'none';
+            }, 3000);
+        }
+
+
+    </script>
+</body>
+</html>
