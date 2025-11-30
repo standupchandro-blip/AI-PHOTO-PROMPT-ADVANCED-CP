@@ -1,0 +1,485 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompter</title>
+
+
+    <!-- Icon/App Styling for Home Screen (PWA meta tags retained) -->
+    <link rel="apple-touch-icon" href="https://placehold.co/180x180/3b82f6/ffffff?text=AI">
+    <link rel="icon" type="image/png" href="https://placehold.co/192x192/3b82f6/ffffff?text=AI" sizes="192x192">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-title" content="Prompter">
+
+
+    <style>
+        /*
+        * All Tailwind CSS classes have been converted to native CSS properties here
+        * to eliminate external CDN dependencies, which were likely causing the freeze.
+        */
+        :root {
+            --color-blue-500: #3b82f6;
+            --color-blue-600: #2563eb;
+            --color-blue-700: #1d4ed8;
+            --color-blue-200: #bfdbfe;
+            --color-blue-50: #eff6ff;
+            --color-indigo-500: #6366f1;
+            --color-indigo-600: #4f46e5;
+            --color-green-500: #22c55e;
+            --color-green-600: #16a34a;
+            --color-gray-800: #1f2937;
+            --color-gray-700: #374151;
+            --color-gray-600: #4b5563;
+            --color-gray-500: #6b7280;
+            --color-gray-400: #9ca3af;
+            --color-gray-300: #d1d5db;
+            --color-gray-200: #e5e7eb;
+            --color-gray-100: #f3f4f6;
+            --color-white: #ffffff;
+            --color-red-500: #ef4444;
+        }
+
+
+        /* Base styles */
+        body {
+            font-family: Arial, Helvetica, sans-serif; /* Fallback to system font */
+            background-color: #f7f9fb;
+            padding: 1rem; /* p-4 */
+        }
+        
+        /* Container Card */
+        .container-card {
+            max-width: 500px;
+            margin: 2rem auto;
+            background-color: var(--color-white);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 10px rgba(0, 0, 0, 0.04);
+            border-radius: 1.5rem; /* rounded-xl (more like rounded-3xl) */
+            padding: 1.5rem; /* p-6 */
+        }
+
+
+        /* Typography */
+        h1 { font-size: 1.875rem; font-weight: 700; color: var(--color-gray-800); margin-bottom: 0.5rem; } /* text-3xl font-bold mb-2 */
+        h2 { font-size: 1.25rem; font-weight: 600; color: var(--color-gray-700); margin-bottom: 1rem; } /* text-xl font-semibold mb-4 */
+        h3 { font-size: 1rem; font-weight: 600; } /* font-semibold */
+        .text-gray-500 { color: var(--color-gray-500); }
+        .text-gray-600 { color: var(--color-gray-600); }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-right { text-align: right; }
+        .font-mono { font-family: monospace; }
+        .break-words { word-break: break-all; }
+
+
+        /* Layout and Spacing */
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .pt-4 { padding-top: 1rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .flex-col { flex-direction: column; }
+        .space-y-3 > * + * { margin-top: 0.75rem; }
+        .border-t { border-top: 1px solid var(--color-gray-200); }
+        .grid-cols-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .gap-3 { gap: 0.75rem; }
+        .w-full { width: 100%; }
+        .ml-2 { margin-left: 0.5rem; }
+        .hidden { display: none; }
+        .block { display: block; }
+
+
+        /* Form Inputs and Textareas */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--color-gray-200);
+            border-radius: 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box; /* Crucial for w-full */
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-blue-500);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .bg-transparent { background-color: transparent; }
+        .resize-none { resize: none; }
+        .focus-outline-none:focus { outline: none; }
+
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1rem; /* py-3 px-4 */
+            font-weight: 700; /* font-bold */
+            border-radius: 0.75rem; /* rounded-xl */
+            transition: all 0.15s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); /* shadow-md */
+        }
+        .btn:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); /* hover:shadow-lg */
+        }
+        .btn-primary {
+            background-color: var(--color-indigo-500);
+            color: var(--color-white);
+        }
+        .btn-primary:hover {
+            background-color: var(--color-indigo-600);
+        }
+        .btn-success {
+            background-color: var(--color-green-500);
+            color: var(--color-white);
+            padding: 0.75rem 1rem; /* py-3 px-4 */
+        }
+        .btn-success:hover {
+            background-color: var(--color-green-600);
+        }
+        .btn-secondary {
+            background-color: var(--color-gray-300);
+            color: var(--color-gray-800);
+            padding: 0.5rem 1rem; /* py-2 px-4 */
+        }
+        .btn-secondary:hover {
+            background-color: var(--color-gray-400);
+        }
+        .btn-nav-blue {
+            background-color: var(--color-blue-500);
+            color: var(--color-white);
+            padding: 0.5rem 1.5rem; /* px-6 py-2 */
+            font-weight: 600; /* font-semibold */
+            border-radius: 0.75rem; /* rounded-xl */
+            transition: all 0.15s;
+        }
+        .btn-nav-blue:hover {
+            background-color: var(--color-blue-600);
+        }
+        .btn-nav-gray {
+            background-color: var(--color-gray-300);
+            color: var(--color-gray-800);
+            padding: 0.5rem 1.5rem; /* px-6 py-2 */
+            font-weight: 600; /* font-semibold */
+            border-radius: 0.75rem; /* rounded-xl */
+            transition: all 0.15s;
+        }
+        .btn-nav-gray:hover {
+            background-color: var(--color-gray-400);
+        }
+        .disabled-opacity {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+
+
+
+        /* Progress Bar */
+        .progress-bar { height: 0.5rem; background-color: var(--color-gray-200); border-radius: 9999px; }
+        .progress-bar-fill { height: 0.5rem; background-color: var(--color-blue-500); border-radius: 9999px; transition: width 0.3s ease-in-out; }
+
+
+        /* Step Section Control */
+        .step-section { display: none; }
+        .step-section.active { display: block; }
+
+
+        /* Custom Radio Button Styling */
+        .custom-radio input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .custom-radio label {
+            cursor: pointer;
+            display: block;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--color-gray-200);
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            font-weight: 500;
+            text-align: center;
+        }
+        .custom-radio input[type="radio"]:checked + label {
+            background-color: var(--color-blue-500);
+            color: var(--color-white);
+            border-color: var(--color-blue-500);
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+        }
+        .custom-radio label:hover {
+            border-color: #93c5fd; /* Light blue hover */
+        }
+        
+        /* Display Blocks */
+        .prompt-display-box {
+            background-color: var(--color-blue-50); 
+            border: 1px solid var(--color-blue-200); 
+            padding: 1rem; 
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .final-prompt-box {
+            background-color: var(--color-gray-100); 
+            padding: 1rem; 
+            border-radius: 0.75rem; 
+            border: 1px solid var(--color-gray-200);
+        }
+        .text-blue-800 { color: var(--color-blue-700); }
+        .text-blue-700 { color: var(--color-blue-700); }
+        
+        /* Message Box */
+        .message-box {
+            position: fixed;
+            bottom: 1.25rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--color-white);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+
+
+        /* Spinner */
+        .spinner-border {
+            display: inline-block;
+            width: 1.5rem;
+            height: 1.5rem;
+            vertical-align: -0.125em;
+            border: 0.25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: 0.75s linear infinite spinner-border-keyframes;
+        }
+
+
+        @keyframes spinner-border-keyframes {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+
+    <div id="app" class="container-card">
+        <h1>AI Prompt Genius 🧠</h1>
+        <p class="text-gray-500 mb-6">Build your prompt, then let our AI give it a creative boost!</p>
+
+
+        <!-- Progress Bar -->
+        <div class="mb-6">
+            <div class="progress-bar">
+                <div id="progressBar" class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+            <p id="progressText" class="text-sm text-gray-500 mt-1 text-right">Step 1 of 5</p>
+        </div>
+
+
+        <!-- STEP 1: Subject & Action -->
+        <div id="step-1" class="step-section active">
+            <h2>Step 1: The Core Idea 🌟</h2>
+            <div class="space-y-4">
+                <div>
+                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Who or what is the main subject? (Required)</label>
+                    <input type="text" id="subject" name="subject" value="" placeholder="e.g., A silver dragon, Spiderman, A single rose" class="form-input">
+                </div>
+                <div>
+                    <label for="action" class="block text-sm font-medium text-gray-700 mb-1">What is the subject doing/where is it?</label>
+                    <input type="text" id="action" name="action" value="" placeholder="e.g., soaring over a stormy sea, eating chips in his bedroom" class="form-input">
+                </div>
+            </div>
+        </div>
+
+
+        <!-- STEP 2: Medium & Art Style -->
+        <div id="step-2" class="step-section">
+            <h2>Step 2: Medium & Style 🎨</h2>
+            <p class="text-sm text-gray-500 mb-3">How do you want the image to look? (Choose one or add your own)</p>
+            <div class="grid-cols-2 gap-3 custom-radio mb-4 flex-container">
+                <input type="radio" id="style-photo" name="medium" value="professional photography, detailed, photorealistic"><label for="style-photo">Photography</label>
+                <input type="radio" id="style-art" name="medium" value="digital painting, highly detailed, fantasy art"><label for="style-art">Digital Painting</label>
+                <input type="radio" id="style-3d" name="medium" value="3D render, Octane render, unreal engine"><label for="style-3d">3D Render (CGI)</label>
+                <input type="radio" id="style-anime" name="medium" value="anime aesthetic, volumetric lighting, cel-shaded"><label for="style-anime">Anime/Cartoon</label>
+            </div>
+            <div>
+                <label for="customStyle" class="block text-sm font-medium text-gray-700 mb-1">Add Custom Details for Style (Optional):</label>
+                <textarea id="customStyle" name="customStyle" rows="2" placeholder="e.g., inspired by Van Gogh, 8-bit pixel art, macro lens shot" class="form-input"></textarea>
+            </div>
+        </div>
+
+
+        <!-- STEP 3: Mood & Lighting -->
+        <div id="step-3" class="step-section">
+            <h2>Step 3: Mood & Lighting 💡</h2>
+            <p class="text-sm text-gray-500 mb-3">Set the atmosphere of the scene. (Choose one or add your own)</p>
+            <div class="grid-cols-2 gap-3 custom-radio mb-4 flex-container">
+                <input type="radio" id="mood-cinematic" name="moodLighting" value="cinematic volumetric lighting, dramatic shadows, moody"><label for="mood-cinematic">Cinematic/Moody</label>
+                <input type="radio" id="mood-soft" name="moodLighting" value="soft focus, tranquil, peaceful atmosphere"><label for="mood-soft">Soft/Peaceful</label>
+                <input type="radio" id="mood-neon" name="moodLighting" value="neon glow, cyberpunk aesthetic, dark streets"><label for="mood-neon">Neon/Cyberpunk</label>
+                <input type="radio" id="mood-golden" name="moodLighting" value="golden hour, warm, diffused sunlight"><label for="mood-golden">Golden Hour</label>
+            </div>
+            <div>
+                <label for="customLighting" class="block text-sm font-medium text-gray-700 mb-1">Add Custom Details for Lighting (Optional):</label>
+                <textarea id="customLighting" name="customLighting" rows="2" placeholder="e.g., strong rim light, single overhead lamp, foggy morning light" class="form-input"></textarea>
+            </div>
+        </div>
+
+
+        <!-- STEP 4: Composition -->
+        <div id="step-4" class="step-section">
+            <h2>Step 4: Composition 📐</h2>
+            <p class="text-sm text-gray-500 mb-3">How should the elements be arranged? (Choose one or add your own)</p>
+            <div class="grid-cols-2 gap-3 custom-radio mb-4 flex-container">
+                <input type="radio" id="comp-thirds" name="composition" value="rule of thirds, symmetrical composition"><label for="comp-thirds">Symmetrical/Rule of Thirds</label>
+                <input type="radio" id="comp-macro" name="composition" value="macro photograph, extreme close-up"><label for="comp-macro">Macro/Close-Up</label>
+                <input type="radio" id="comp-dutch" name="composition" value="dutch angle, chaotic perspective"><label for="comp-dutch">Dutch Angle</label>
+                <input type="radio" id="comp-wide" name="composition" value="ultra-wide shot, vast landscape, epic scale"><label for="comp-wide">Epic/Wide Shot</label>
+            </div>
+            <div>
+                <label for="customComposition" class="block text-sm font-medium text-gray-700 mb-1">Add Custom Details for Composition (Optional):</label>
+                <textarea id="customComposition" name="customComposition" rows="2" placeholder="e.g., shot on 50mm lens, low angle, leading lines" class="form-input"></textarea>
+            </div>
+        </div>
+
+
+        <!-- STEP 5: Final Modifiers -->
+        <div id="step-5" class="step-section">
+            <h2>Step 5: Final Quality Boosters ✨</h2>
+            <p class="text-sm text-gray-500 mb-3">Add technical terms to ensure maximum quality.</p>
+            <div class="space-y-4">
+                <input type="text" id="finalMods" name="finalMods" value="8k, highly detailed, smooth, trending on ArtStation" placeholder="e.g., 8k, highly detailed, smooth, trending on ArtStation" class="form-input">
+                <p class="text-xs text-gray-500">Suggested default: `8k, highly detailed, smooth, trending on ArtStation`</p>
+            </div>
+        </div>
+
+
+        <!-- FINAL PROMPT (Step 6) -->
+        <div id="step-6" class="step-section">
+            <h2>Step 6: Review & Enhance! 🚀</h2>
+            <p class="text-gray-600 mb-4">You have a structured prompt. Now, let's use AI to add rich descriptive flair!</p>
+
+
+            <div class="prompt-display-box">
+                <h3 class="text-blue-800 mb-2">Structured Prompt:</h3>
+                <p id="basePromptDisplay" class="text-sm text-blue-700 font-mono break-words"></p>
+            </div>
+
+
+            <button id="enhanceBtn" onclick="generateEnhancedPrompt()" class="btn btn-primary w-full flex items-center justify-center">
+                <span id="enhanceText">Enhance with AI (Deep Detail)</span>
+                <div id="loadingIndicator" class="hidden spinner-border" role="status"></div>
+            </button>
+
+
+            <h3 class="text-gray-700 mt-6 mb-2">Final Prompt for AI Client:</h3>
+            <div class="final-prompt-box">
+                <textarea id="finalPromptTextarea" rows="8" readonly class="w-full bg-transparent text-lg font-mono text-gray-800 focus-outline-none resize-none"></textarea>
+            </div>
+
+
+            <div class="mt-4 flex flex-col space-y-3">
+                <button onclick="copyPrompt()" class="btn btn-success w-full">
+                    Copy Final Prompt
+                </button>
+                <button onclick="restart()" class="btn btn-secondary w-full">
+                    Start Over
+                </button>
+            </div>
+
+
+            <!-- Custom message box -->
+            <div id="messageBox" class="hidden message-box" style="opacity: 0;">
+                Prompt Copied Successfully!
+            </div>
+        </div>
+
+
+
+
+        <!-- Navigation Buttons -->
+        <div class="mt-8 pt-4 border-t flex justify-between">
+            <button id="prevBtn" onclick="navigateStep(-1)" class="btn-nav-gray disabled-opacity" disabled>
+                ← Back
+            </button>
+            <button id="nextBtn" onclick="navigateStep(1)" class="btn-nav-blue">
+                Next →
+            </button>
+        </div>
+
+
+    </div>
+
+
+    <script>
+        // Global state and configuration
+        const STEPS = 6; // 5 input steps + 1 final step
+        let currentStep = 1;
+        let aiEnhancementText = ""; // Stores the text generated by the LLM
+
+
+        // Data structure to hold the prompt components
+        let promptData = {
+            subject: "",
+            action: "",
+            medium: "",
+            customStyle: "",
+            moodLighting: "",
+            customLighting: "",
+            composition: "",
+            customComposition: "",
+            finalMods: ""
+        };
+
+
+        // LLM API Configuration
+        const MODEL = 'gemini-2.5-flash-preview-09-2025';
+        const API_KEY = "";
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+        const MAX_RETRIES = 3;
+
+
+        // DOM elements (declared here, assigned and checked in init())
+        let appDiv, prevBtn, nextBtn, progressBar, progressText, finalPromptTextarea, messageBox, basePromptDisplay, enhanceBtn, enhanceText, loadingIndicator;
+
+
+        // --- Core Functions ---
+
+
+        /**
+         * Updates the UI to show the current step's content.
+         */
+        function updateUI() {
+            // 1. Update Step Visibility
+            document.querySelectorAll('.step-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            const currentStepEl = document.getElementById(`step-${currentStep}`);
+            if (currentStepEl) {
+                currentStepEl.classList.add('active');
+            }
+
+
+            // 2. Update Progress Bar
+            const progress = ((currentStep - 1) / (STEPS - 1)) * 100;
+            if (progressBar) {
+                progressBar.style.width = `${progress}%`;
+            }
+
+
+            // 3. Update Progress Text
+            if (progressText) {
+                if (currentStep === STEPS) {
+                    progressText.textContent = `Review & Finalize`;
+                } else {
+                    progressText.textContent = `Step ${currentStep} of ${STEPS - 1}`;
+                }
+            }
+
+
+            // 4. Update Navigation Buttons
