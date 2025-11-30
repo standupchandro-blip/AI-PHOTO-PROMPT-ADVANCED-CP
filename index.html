@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Test</title>
+    <!-- Minimal Styling -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            padding: 20px;
+        }
+        .card {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="card">
+        <h1>JS Diagnostic Test</h1>
+        <p style="font-size: 0.9em; color: #555;">Type in the boxes below. The bottom box should update immediately.</p>
+
+
+        <!-- Input 1 -->
+        <label for="input1">Subject:</label>
+        <input type="text" id="input1" placeholder="e.g., A blue frog">
+
+
+        <!-- Input 2 -->
+        <label for="input2">Action/Style:</label>
+        <input type="text" id="input2" placeholder="e.g., sitting on a lily pad, highly detailed">
+
+
+        <hr style="margin: 20px 0;">
+
+
+        <!-- Output Area -->
+        <label for="output">Concatenated Prompt (Should auto-update):</label>
+        <textarea id="output" rows="4" readonly placeholder="Result will appear here..."></textarea>
+    </div>
+
+
+    <script>
+        // Get references to the DOM elements
+        const input1 = document.getElementById('input1');
+        const input2 = document.getElementById('input2');
+        const output = document.getElementById('output');
+
+
+        // Function to combine and display the text
+        function updateOutput() {
+            // Get values, trim whitespace, and combine with a comma separator
+            const text1 = input1.value.trim();
+            const text2 = input2.value.trim();
+            
+            let combined = [text1, text2].filter(t => t).join(', '); // Filter empty parts
+
+
+            // Update the textarea value
+            output.value = combined;
+        }
+
+
+        // Attach the simple, basic event listeners
+        if (input1) {
+            input1.addEventListener('input', updateOutput);
+        } else {
+             console.error("Diagnostic failed: input1 element not found.");
+        }
+        
+        if (input2) {
+            input2.addEventListener('input', updateOutput);
+        } else {
+            console.error("Diagnostic failed: input2 element not found.");
+        }
+        
+        // Final check that the script executed successfully
+        document.body.style.backgroundColor = '#d1e7dd'; // Light green to confirm JS start
+        
+    </script>
+</body>
+</html>
