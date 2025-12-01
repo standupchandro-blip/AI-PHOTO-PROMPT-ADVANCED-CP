@@ -8,7 +8,7 @@ const port = 3000; // The port the server will run on
 // **IMPORTANT SECURITY NOTE:** // In a real application, you would load this key from a secure environment variable (e.g., process.env.GEMINI_API_KEY).
 // For this tutorial, we are placing it directly for demonstration, but you MUST change the line below.
 // The key should NOT be committed to version control like Git.
-const GEMINI_API_KEY = AIzaSyBuBkAKCSl59wvRr-9vS_8OiWL5kc33yXw; // <<< PASTE YOUR KEY HERE
+const GEMINI_API_KEY = "AIzaSyBuBkAKCSl59wvRr-9vS_8OiWL5kc33yXw"; // <<< PASTE YOUR KEY HERE
 
 // --- Server Setup ---
 
