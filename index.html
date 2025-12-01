@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Builder</title>
+    
+    <!-- Custom CSS for a vibrant, modern, mobile-first look -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f0f4f8, #e0e7ee); /* Soft gradient background */
+            color: #1f2937;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .container {
+            width: 95%;
+            max-width: 480px;
+            background: #ffffff;
+            margin: 24px 0;
+            padding: 28px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1c3d52; /* Dark Teal */
+            margin-bottom: 4px;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+        .progress-bar {
+            height: 10px;
+            background-color: #e5e7eb;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #3b82f6; /* Blue */
+            border-radius: 5px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Input/Textarea Styling */
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+            margin-top: 5px; 
+            margin-bottom: 15px;
+            background-color: #f9fafb;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        /* Button Styling */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-blue {
+            background-color: #2563eb; 
+            color: white;
+            flex-grow: 1;
+            margin-left: 5px;
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+        }
+        .btn-blue:hover:not(:disabled) { background-color: #1d4ed8; }
+        
+        .btn-gray {
+            background-color: #f3f4f6;
+            color: #374151;
+            flex-grow: 1;
+            margin-right: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .btn-gray:hover:not(:disabled) { background-color: #e5e7eb; }
+
+        .btn-green {
+            background-color: #10b981; /* Success Green */
+            color: white;
+            width: 100%;
+            margin-top: 15px;
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+        }
+        .btn-green:hover { background-color: #059669; }
+
+        /* Specific style for the Enhance button */
+        #enhanceBtn {
+            background-color: #ef4444; /* Red for attention */
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.5);
+        }
+        #enhanceBtn:hover:not(:disabled) {
+             background-color: #dc2626;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 20px;
+        }
+        
+        /* Final Prompt Box */
+        .final-prompt-box {
+            background-color: #fef2f2; /* Light Red/Pink for final output */
+            padding: 20px;
+            border: 2px solid #ef4444; 
+            border-radius: 12px;
+            font-size: 15px;
+            min-height: 120px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+            color: #991b1b; /* Dark Red text */
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .step-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        .icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+        
+        /* Enhanced Radio Grid */
+        .radio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .radio-grid input[type="radio"] { display: none; }
+        .radio-grid label {
+            display: block;
+            padding: 12px 8px;
+            border: 2px solid #bfdbfe;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            transition: all 0.2s;
+        }
+        .radio-grid label:hover {
+            background-color: #dbeafe; 
+        }
+        .radio-grid input[type="radio"]:checked + label {
+            background-color: #2563eb; /* Selected Blue */
+            color: white;
+            border-color: #1d4ed8;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+        }
+        
+        /* Message Box */
+        .message-box {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #3b82f6; 
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>AI Prompt Builder ✍️</h1>
+        <p class="subtitle">Build your perfect prompt in 5 simple steps, then let AI enhance it.</p>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill" style="width: 0%;"></div>
+        </div>
+        <p id="progressText" style="text-align: right; margin-bottom: 20px; font-weight: 600; color: #6b7280;">Step 1 of 5</p>
+
+        <!-- Step Content -->
+        <div id="stepContainer">
+            <!-- Content will be injected here -->
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button id="backBtn" class="btn btn-gray" onclick="navigateStep(-1)" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon" style="margin-right: 4px;"><path d="m15 18-6-6 6-6"/></svg>
+                Back
+            </button>
+            <button id="nextBtn" class="btn btn-blue" onclick="navigateStep(1)">
+                Next
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon" style="margin-left: 4px;"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Message Box -->
+    <div id="messageBox" class="message-box hidden"></div>
+
+    <script>
+        // --- State Management and Configuration ---
+        const TOTAL_STEPS = 6; 
+        let currentStep = 1;
+        let isProcessing = false;
+
+        // *** IMPORTANT CHANGE 1: API_PROXY_URL ***
+        // This is the URL that points to your running Node.js server (proxy.js).
+        // The server is running on port 3000 and the endpoint is /api/enhance-prompt
+        const API_PROXY_URL = 'http://localhost:3000/api/enhance-prompt';
+
+        const promptData = {
+            subject: "", action: "",
+            medium: "digital painting", customStyle: "",
+            moodLighting: "cinematic volumetric lighting", customLighting: "",
+            composition: "rule of thirds", customComposition: "",
+            finalMods: "8k, highly detailed, smooth, trending on ArtStation"
+        };
+        let enhancedPromptText = ""; // Stores the output from the AI
+
+        const STEPS_CONFIG = [
+            { id: 1, title: "The Core Idea 🌟" },
+            { id: 2, title: "Medium & Style 🎨" },
+            { id: 3, title: "Mood & Lighting 💡" },
+            { id: 4, title: "Composition 📐" },
+            { id: 5, title: "Final Quality Boosters ✨" },
+            { id: 6, title: "Review & Output 🚀" }
+        ];
+
+        // --- DOM Elements ---
+        const stepContainer = document.getElementById('stepContainer');
+        const backBtn = document.getElementById('backBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const messageBox = document.getElementById('messageBox');
+        
+        // --- UI Helper Functions ---
+
+        function showMessage(text, type = 'info', duration = 3000) {
+            messageBox.innerHTML = text;
+            messageBox.style.backgroundColor = type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#3b82f6');
+            messageBox.classList.remove('hidden');
+
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, duration);
+        }
+
+        function setProcessingState(state) {
+            isProcessing = state;
+            const enhanceBtn = document.getElementById('enhanceBtn');
+            if (enhanceBtn) {
+                enhanceBtn.disabled = state;
+                if (state) {
+                    enhanceBtn.innerHTML = '<div class="spinner"></div> Generating Enhancement...';
+                } else {
+                    enhanceBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M12 2a10 10 0 0 0-9 15.5L3 21l3.5-1A10 10 0 1 0 12 2z"/></svg> Enhance Prompt';
+                }
+            }
+        }
+
+        /**
+         * Retries the fetch operation with exponential backoff for resilience against transient network issues.
+         */
+        async function fetchWithBackoff(url, options, maxRetries = 3) {
+            let lastError;
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response;
+                    } 
+                    // Retry only on specific transient errors (like 429 Rate Limit)
+                    if (response.status === 429) {
+                         lastError = new Error(`Rate limit hit (429). Retrying...`);
+                    } else if (response.status >= 400) {
+                        lastError = new Error(`Proxy call failed with status ${response.status}`);
+                        const errorBody = await response.json().catch(() => ({}));
+                        console.error('Proxy Error details:', errorBody);
+                        break; // Don't retry non-transient errors
+                    }
+                } catch (error) {
+                    lastError = error;
+                }
+
+                if (i < maxRetries - 1) {
+                    const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+            throw lastError || new Error("Maximum retries reached without success.");
+        }
+
+
+        function updatePromptData(event) {
+            const element = event.target;
+            const key = element.id || element.name;
+            
+            if (element.type === 'radio') {
+                promptData[element.name] = element.value.trim();
+            } else {
+                promptData[key] = element.value.trim();
+            }
+        }
+
+        function generateBasePrompt() {
+            const parts = [
+                promptData.subject, promptData.action,
+                promptData.medium, promptData.customStyle,
+                promptData.moodLighting, promptData.customLighting,
+                promptData.composition, promptData.customComposition,
+                promptData.finalMods
+            ];
+
+            // Create the prompt in a readable, structured format for the AI
+            const structuredPrompt = `
+                Main Subject: ${promptData.subject || 'N/A'}
+                Action/Setting: ${promptData.action || 'N/A'}
+                Medium/Style: ${promptData.medium}${promptData.customStyle ? ', ' + promptData.customStyle : ''}
+                Lighting/Mood: ${promptData.moodLighting}${promptData.customLighting ? ', ' + promptData.customLighting : ''}
+                Composition: ${promptData.composition}${promptData.customComposition ? ', ' + promptData.customComposition : ''}
+                Quality Modifiers: ${promptData.finalMods}
+            `;
+
+            return structuredPrompt;
+        }
+        
+        function getFinalPrompt() {
+            return enhancedPromptText.trim() || generateBasePrompt().replace(/\s+/g, ' ').trim();
+        }
+        
+        function copyPrompt() {
+            const promptToCopy = enhancedPromptText.trim();
+            if (!promptToCopy || promptToCopy.includes("Go back to Step 1") || promptToCopy.includes("Click \"Enhance Prompt\"")) {
+                showMessage("Nothing to copy! Generate the prompt first.", 'error');
+                return;
+            }
+
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = promptToCopy;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            
+            try {
+                // Using document.execCommand('copy') for compatibility in sandbox environments
+                document.execCommand('copy'); 
+                showMessage('<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/></svg>Prompt Copied!', 'success');
+            } catch (err) {
+                showMessage("Copy failed. Please manually select the text.", 'error');
+            }
+            
+            document.body.removeChild(tempTextarea);
+        }
+        
+        function restartPrompt() {
+            // Reset all values to initial state
+            Object.assign(promptData, {
+                subject: "", action: "",
+                medium: "digital painting", customStyle: "",
+                moodLighting: "cinematic volumetric lighting", customLighting: "",
+                composition: "rule of thirds", customComposition: "",
+                finalMods: "8k, highly detailed, smooth, trending on ArtStation"
+            });
+            enhancedPromptText = ""; 
+            currentStep = 1;
+            updateUI();
+        }
+
+        async function enhancePrompt() {
+            if (isProcessing) return;
+
+            const basePrompt = generateBasePrompt();
+            if (!promptData.subject.trim()) {
+                showMessage("Please enter the main subject in Step 1 before enhancing.", 'error');
+                return;
+            }
+
+            setProcessingState(true);
+            enhancedPromptText = ""; // Clear previous enhancement
+            updateUI(); // Render loading state
+
+            // *** IMPORTANT CHANGE 2: Prepare payload for the Proxy Server ***
+            // The server is expecting a simple JSON object with the userPrompt key.
+            const userPromptForServer = `Base Prompt to Enhance: "${basePrompt}"`;
+            
+            const payload = { 
+                userPrompt: userPromptForServer 
+            };
+
+            try {
+                // *** IMPORTANT CHANGE 3: Call the Proxy Server URL ***
+                const response = await fetchWithBackoff(API_PROXY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                
+                // *** IMPORTANT CHANGE 4: Process the Proxy Server's Response ***
+                // The proxy server sends back { success: true, enhancedPrompt: "..." }
+                if (result.success && result.enhancedPrompt) {
+                    enhancedPromptText = result.enhancedPrompt.trim();
+                    showMessage('Prompt enhanced successfully!', 'success');
+                } else {
+                    const errorMsg = result.error || "Unknown error from proxy server.";
+                    console.error("Proxy Server Error:", errorMsg);
+                    enhancedPromptText = `Error: ${errorMsg}. The base prompt was: ${basePrompt.replace(/\s+/g, ' ').trim()}`;
+                    showMessage(errorMsg, 'error', 5000);
+                }
+
+            } catch (error) {
+                const errorMessage = `Proxy Request Failed: ${error.message}. Is your proxy server running?`;
+                console.error(errorMessage, error);
+                enhancedPromptText = `Connection Error: ${errorMessage}. Please check the server status. The base prompt was: ${basePrompt.replace(/\s+/g, ' ').trim()}`;
+                showMessage(errorMessage, 'error', 7000);
+            } finally {
+                setProcessingState(false);
+                updateUI();
+            }
+        }
+
+
+        // --- UI Rendering Functions (No logic changes from previous version) ---
+
+        function renderStepContent() {
+            let html = '';
+            const step = STEPS_CONFIG.find(c => c.id === currentStep);
+
+            // Universal title for the current step
+            html += `<div class="step-title">${step.title}</div>`;
+
+            switch (currentStep) {
+                case 1:
+                    html += `
+                        <div class="form-group">
+                            <label for="subject" style="font-weight: 600;">Who or what is the main subject? <span style="color: #ef4444;">(Required)</span></label>
+                            <input type="text" id="subject" value="${promptData.subject}" oninput="updatePromptData(event)" placeholder="e.g., A silver dragon, A cyberpunk samurai, A fluffy dog">
+                        </div>
+                        <div class="form-group">
+                            <label for="action" style="font-weight: 600;">What is the subject doing/where is it?</label>
+                            <input type="text" id="action" value="${promptData.action}" oninput="updatePromptData(event)" placeholder="e.g., soaring over a stormy sea, eating chips in his bedroom">
+                        </div>
+                    `;
+                    break;
+                case 2:
+                    html += `
+                        <p class="subtitle" style="margin-bottom: 20px;">Choose a primary medium or artistic style:</p>
+                        <div class="radio-grid">
+                            <input type="radio" id="style-photo" name="medium" value="professional photography, detailed, photorealistic" onchange="updatePromptData(event)" ${promptData.medium.includes('photography') ? 'checked' : ''}>
+                            <label for="style-photo">Photography</label>
+                            
+                            <input type="radio" id="style-art" name="medium" value="digital painting, highly detailed, fantasy art" onchange="updatePromptData(event)" ${promptData.medium.includes('painting') ? 'checked' : ''}>
+                            <label for="style-art">Digital Painting</label>
+                            
+                            <input type="radio" id="style-3d" name="medium" value="3D render, Octane render, unreal engine" onchange="updatePromptData(event)" ${promptData.medium.includes('render') ? 'checked' : ''}>
+                            <label for="style-3d">3D Render (CGI)</label>
+
+                            <input type="radio" id="style-steampunk" name="medium" value="steampunk illustration, highly detailed, Victorian aesthetic" onchange="updatePromptData(event)" ${promptData.medium.includes('steampunk') ? 'checked' : ''}>
+                            <label for="style-steampunk">Steampunk</label>
+                            
+                            <input type="radio" id="style-ink" name="medium" value="pen and ink drawing, heavy crosshatching, dark academia" onchange="updatePromptData(event)" ${promptData.medium.includes('ink drawing') ? 'checked' : ''}>
+                            <label for="style-ink">Ink Drawing</label>
+
+                            <input type="radio" id="style-watercolor" name="medium" value="traditional watercolor painting, wet-on-wet technique" onchange="updatePromptData(event)" ${promptData.medium.includes('watercolor') ? 'checked' : ''}>
+                            <label for="style-watercolor">Watercolor</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="customStyle" style="font-weight: 600;">Custom Style/Artist (Optional):</label>
+                            <textarea id="customStyle" rows="2" oninput="updatePromptData(event)" placeholder="e.g., inspired by Van Gogh, 8-bit pixel art, manga style">${promptData.customStyle}</textarea>
+                        </div>
+                    `;
+                    break;
+                case 3:
+                    html += `
+                        <p class="subtitle" style="margin-bottom: 20px;">Set the atmosphere and light source:</p>
+                        <div class="radio-grid">
+                            <input type="radio" id="mood-cinematic" name="moodLighting" value="cinematic volumetric lighting, dramatic shadows" onchange="updatePromptData(event)" ${promptData.moodLighting.includes('cinematic') ? 'checked' : ''}>
+                            <label for="mood-cinematic">Cinematic/Moody</label>
+                            
+                            <input type="radio" id="mood-golden" name="moodLighting" value="golden hour, warm, diffused sunlight" onchange="updatePromptData(event)" ${promptData.moodLighting.includes('golden hour') ? 'checked' : ''}>
+                            <label for="mood-golden">Golden Hour</label>
+                            
+                            <input type="radio" id="mood-neon" name="moodLighting" value="neon glow, cyberpunk aesthetic" onchange="updatePromptData(event)" ${promptData.moodLighting.includes('neon') ? 'checked' : ''}>
+                            <label for="mood-neon">Neon/Cyberpunk</label>
+
+                            <input type="radio" id="mood-studio" name="moodLighting" value="soft studio lighting, clean catchlights" onchange="updatePromptData(event)" ${promptData.moodLighting.includes('soft studio') ? 'checked' : ''}>
+                            <label for="mood-studio">Soft Studio Light</label>
+                            
+                            <input type="radio" id="mood-backlit" name="moodLighting" value="backlit silhouette, strong contrast" onchange="updatePromptData(event)" ${promptData.moodLighting.includes('backlit silhouette') ? 'checked' : ''}>
+                            <label for="mood-backlit">Backlit Silhouette</label>
+
+                            <input type="radio" id="mood-foggy" name="moodLighting" value="dense fog, high humidity, muted colors" onchange="updatePromptData(event)" ${promptData.moodLighting.includes('fog') ? 'checked' : ''}>
+                            <label for="mood-foggy">Foggy/Eerie</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="customLighting" style="font-weight: 600;">Custom Lighting/Mood (Optional):</label>
+                            <textarea id="customLighting" rows="2" oninput="updatePromptData(event)" placeholder="e.g., strong rim light, single overhead lamp, bioluminescent glow">${promptData.customLighting}</textarea>
+                        </div>
+                    `;
+                    break;
+                case 4:
+                    html += `
+                        <p class="subtitle" style="margin-bottom: 20px;">Choose a composition style or camera angle:</p>
+                        <div class="radio-grid">
+                            <input type="radio" id="comp-thirds" name="composition" value="rule of thirds, symmetrical composition" onchange="updatePromptData(event)" ${promptData.composition.includes('thirds') ? 'checked' : ''}>
+                            <label for="comp-thirds">Rule of Thirds</label>
+                            
+                            <input type="radio" id="comp-macro" name="composition" value="macro photograph, extreme close-up" onchange="updatePromptData(event)" ${promptData.composition.includes('macro') ? 'checked' : ''}>
+                            <label for="comp-macro">Macro/Close-Up</label>
+                            
+                            <input type="radio" id="comp-wide" name="composition" value="ultra-wide shot, vast landscape" onchange="updatePromptData(event)" ${promptData.composition.includes('wide shot') ? 'checked' : ''}>
+                            <label for="comp-wide">Epic/Wide Shot</label>
+
+                            <input type="radio" id="comp-portrait" name="composition" value="intimate portrait shot, soft focus" onchange="updatePromptData(event)" ${promptData.composition.includes('portrait') ? 'checked' : ''}>
+                            <label for="comp-portrait">Portrait Shot</label>
+
+                            <input type="radio" id="comp-dutch" name="composition" value="dramatic Dutch angle, canted shot" onchange="updatePromptData(event)" ${promptData.composition.includes('dutch angle') ? 'checked' : ''}>
+                            <label for="comp-dutch">Dutch Angle</label>
+
+                            <input type="radio" id="comp-fisheye" name="composition" value="fisheye lens, distorted perspective" onchange="updatePromptData(event)" ${promptData.composition.includes('fisheye') ? 'checked' : ''}>
+                            <label for="comp-fisheye">Fisheye Lens</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="customComposition" style="font-weight: 600;">Custom Composition/Angle (Optional):</label>
+                            <textarea id="customComposition" rows="2" oninput="updatePromptData(event)" placeholder="e.g., high angle drone shot, low camera angle, depth of field">${promptData.customComposition}</textarea>
+                        </div>
+                    `;
+                    break;
+                case 5:
+                    html += `
+                        <p class="subtitle" style="margin-bottom: 20px;">Add technical terms to ensure maximum quality and realism.</p>
+                        <div class="form-group">
+                            <label for="finalMods" style="font-weight: 600;">Quality Modifiers:</label>
+                            <input type="text" id="finalMods" value="${promptData.finalMods}" oninput="updatePromptData(event)" placeholder="e.g., 8k, highly detailed, smooth, trending on ArtStation">
+                        </div>
+                        <p style="font-size: 0.8em; color: #9ca3af; margin-top: -10px;">The default values are highly recommended for technical fidelity.</p>
+                    `;
+                    break;
+                case 6:
+                    const finalPrompt = enhancedPromptText.trim();
+                    const basePrompt = generateBasePrompt();
+
+                    html += `
+                        <div style="font-weight: 700; color: #2563eb; margin-bottom: 12px; font-size: 1.1em;">1. Structured Prompt (Base)</div>
+                        <pre style="font-size: 0.9em; margin-bottom: 25px; color: #4b5563; border-left: 3px solid #bfdbfe; padding: 10px; background-color: #f7f7f7; border-radius: 8px;">${basePrompt || 'The prompt is empty. Go back to Step 1 to add a subject.'}</pre>
+                        
+                        <button id="enhanceBtn" class="btn" onclick="enhancePrompt()" style="width: 100%; margin-bottom: 30px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M12 2a10 10 0 0 0-9 15.5L3 21l3.5-1A10 10 0 1 0 12 2z"/></svg>
+                            Enhance Prompt
+                        </button>
+
+                        <div style="font-weight: 700; color: #991b1b; margin-bottom: 15px; font-size: 1.1em;">2. Final AI-Enhanced Prompt (Ready to Copy)</div>
+                        <div class="final-prompt-box" id="finalPromptOutput">
+                            ${finalPrompt || 'Click "Enhance Prompt" above to use your secure server to talk to Gemini AI and add cinematic details.'}
+                        </div>
+
+                        <button class="btn btn-green" onclick="copyPrompt()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+                            Copy Final Prompt
+                        </button>
+                        
+                        <button class="btn btn-gray" onclick="restartPrompt()" style="margin-top: 10px; margin-left: 0;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M21 12a9 9 0 0 0-9-9c-2.484 0-4.73 1.01-6.364 2.636L3 7"/><path d="M3 3v4h4"/><path d="M3 12a9 9 0 0 0 9 9c2.484 0 4.73-1.01 6.364-2.636L21 17"/><path d="M21 21v-4h-4"/></svg>
+                            Start Over
+                        </button>
+                    `;
+                    break;
+            }
+            stepContainer.innerHTML = html;
+            setProcessingState(isProcessing);
+        }
+
+        function updateNavigation() {
+            const isFinalStep = currentStep === TOTAL_STEPS;
+            const isFirstStep = currentStep === 1;
+            
+            nextBtn.innerHTML = isFinalStep ? 
+                `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon" style="margin-left: 4px;"><path d="M20 6 9 17l-5-5"/></svg> Finish` :
+                `Next <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon" style="margin-left: 4px;"><path d="m9 18 6-6-6-6"/></svg>`;
+
+            backBtn.disabled = isFirstStep || isProcessing;
+            nextBtn.disabled = isProcessing;
+            
+            progressText.textContent = isFinalStep ? "Review & Enhancement" : `Step ${currentStep} of ${TOTAL_STEPS - 1}`;
+            
+            const progress = (currentStep - 1) / (TOTAL_STEPS - 1);
+            progressFill.style.width = `${progress * 100}%`;
+        }
+
+        function updateUI() {
+            renderStepContent();
+            updateNavigation();
+        }
+        
+        function validateStep() {
+            if (currentStep === 1) {
+                if (!promptData.subject.trim()) {
+                    showMessage("Please enter the main subject to proceed (Step 1).", 'error');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function navigateStep(direction) {
+            if (isProcessing) return;
+
+            if (direction > 0 && !validateStep()) {
+                return;
+            }
+            
+            if (currentStep === TOTAL_STEPS - 1 && direction > 0) {
+                 currentStep = TOTAL_STEPS;
+            } else {
+                 currentStep = Math.min(TOTAL_STEPS, Math.max(1, currentStep + direction));
+            }
+            
+            updateUI();
+            
+            const container = document.querySelector('.container');
+            if(container) container.scrollTop = 0;
+        }
+        
+        // --- Initialization ---
+        updateUI();
+
+    </script>
+</body>
+</html>
+
